@@ -14,9 +14,72 @@
         - when you hover it longer than 3 seconds it disappears
     -->
     <script>
+    	var getRandomColor = function () {
+  			function c() {
+    			return Math.floor(Math.random() * 256).toString(16);
+  			}
+  			return ("#" + c() + c() + c() + c()).substr(0, 7);
+		};
+
         var onLoadCallback = function(containerSize, childSize, numberOfChildren) {
-            
-        }
+            containerSize = parseInt(containerSize, 10);
+            childSize = parseInt(childSize, 10);
+            numberOfChildren = parseInt(numberOfChildren, 10);
+
+            var maxNumberOfChildren = (containerSize * containerSize) / (childSize * childSize);
+
+            if (isNaN(containerSize) || isNaN(childSize) || isNaN(numberOfChildren)) {
+                console.error('some of params are NaN');
+            } else if (childSize > containerSize) {
+                console.error('childSize cannot be bigger containerSize');
+                return;
+            } else if (numberOfChildren > maxNumberOfChildren) {
+                console.warn('numberOfChildren is bigger then container can fit');
+            }
+
+            // create container div
+            var containerDiv = document.querySelector('#container');
+            if (containerDiv) {
+                containerDiv.innerHTML = '';
+            } else {
+                containerDiv = document.createElement('div');
+                containerDiv.id = 'container';
+                containerDiv.style.backgroundColor = 'black';
+                containerDiv.style.width = containerSize + 'px';
+                containerDiv.style.height = containerSize + 'px';
+                containerDiv.style.lineHeight = 0;
+
+                var removeTimer;
+                containerDiv.addEventListener('mouseover', function (e) {
+                    var el = e.target;
+
+                    removeTimer = setTimeout(function () {
+                        el.parentNode.removeChild(el);
+                    }, 3000)
+                });
+                containerDiv.addEventListener('mouseout', function (e) {
+                    clearTimeout(removeTimer);
+                });
+            }
+
+            // create child divs
+            var childEl;
+            for (var n = 0; n < numberOfChildren && n < maxNumberOfChildren; n++) {
+            	childEl = document.createElement('span');
+                childEl.style.display = 'inline-block';
+            	childEl.style.backgroundColor = getRandomColor();
+                childEl.style.width = childSize + 'px';
+                childEl.style.height = childSize + 'px';
+                containerDiv.appendChild(childEl);
+            }
+
+            // append results to body
+            document.body.appendChild(containerDiv);
+        };
+
+        document.addEventListener('DOMContentLoaded', function () {   
+	        onLoadCallback(200, 50, 17);
+        });
     </script>
 </head>
 <body>
